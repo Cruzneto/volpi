@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>History</title>
+</head>
+<body>
+    <h2>History</h2>
+    <ul>
+        {% for record in history %}
+            <li>{{ record.date }}: {{ record.amount }} ml</li>
+        {% empty %}
+            <li>No history available.</li>
+        {% endfor %}
+    </ul>
+    <a href="{% url 'index' %}">Back to Home</a>
+</body>
+</html>
