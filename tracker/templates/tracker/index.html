@@ -1,25 +1,56 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Water Tracker</title>
+    <link rel="stylesheet" href="{% static 'tracker/style.css' %}">
 </head>
 <body>
-    <h2>Welcome, {{ user.username }}</h2>
-    <p>Recommended water intake: {{ recommended_water }} ml</p>
-    <p>Today's intake: {{ today_intake }} ml</p>
-    <p>Remaining: {{ remaining_water }} ml</p>
-    <form method="post" action="{% url 'add_intake' 200 %}">
+    <h1>Water Tracker</h1>
+    <div>
+        <p>Recommended Daily Water Intake: {{ recommended_water }} ml</p>
+        <p>Today's Water Intake: {{ today_intake }} ml</p>
+        <p>Remaining Water Intake: {{ remaining_water }} ml</p>
+    </div>
+    <hr>
+    <h2>Add Water Intake</h2>
+    <form method="post" action="{% url 'add_intake' amount=200 %}">
         {% csrf_token %}
-        <button type="submit">Add 200 ml</button>
+        <button type="submit">Adicionar 200 ml (Copo Pequeno)</button>
     </form>
-    <form method="post" action="{% url 'add_intake' 350 %}">
+    <form method="post" action="{% url 'add_intake' amount=350 %}">
         {% csrf_token %}
-        <button type="submit">Add 350 ml</button>
+        <button type="submit">Adicionar 350 ml (Copo Médio)</button>
     </form>
-    <form method="post" action="{% url 'add_intake' 500 %}">
+    <form method="post" action="{% url 'add_intake' amount=500 %}">
         {% csrf_token %}
-        <button type="submit">Add 500 ml</button>
+        <button type="submit">Adicionar 500 ml (Garrafa Média)</button>
     </form>
+    <hr>
+    <h2>History</h2>
+    <ul>
+        {% for date, intakes, goal_met in history_with_goals %}
+            <li>
+                <strong>{{ date }}</strong> - 
+                {% if goal_met %}
+                    Goal Met
+                {% else %}
+                    Goal Not Met
+                {% endif %}
+                <ul>
+                    {% for intake in intakes %}
+                        <li>{{ intake.amount }} ml at {{ intake.time }}</li>
+                    {% endfor %}
+                </ul>
+            </li>
+        {% endfor %}
+    </ul>
+    <a href="{% url 'history' %}">
+        <button>History</button>
+    </a>
+    <p></p>
     <form method="post" action="{% url 'logout' %}">
         {% csrf_token %}
         <button type="submit">Logout</button>

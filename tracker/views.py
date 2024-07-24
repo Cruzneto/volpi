@@ -4,9 +4,11 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.decorators import login_required
 from .models import User, WaterIntake
 from django import forms
-from datetime import date
+from datetime import date, timedelta
 from django.db.models import Sum
 from django.views.decorators.http import require_POST
+from collections import defaultdict
+
 
 
 class RegisterForm(UserCreationForm):
@@ -71,3 +73,24 @@ def history(request):
     return render(request, 'tracker/history.html', {'history': history})
 
 
+@login_required
+def history_view(request):
+    user = request.user
+    start_date = date.today() - timedelta(days=30)  # Exemplo: histórico dos últimos 30 dias
+    intakes = WaterIntake.objects.filter(user=user, date__gte=start_date).order_by('date')
+
+    history = []
+    recommended_daily_intake = user.weight * 35  # Recalcular a ingestão diária recomendada com base no peso do usuário
+
+    current_date = start_date
+    while current_date <= date.today():
+        daily_intake = intakes.filter(date=current_date).aggregate(Sum('amount'))['amount__sum'] or 0
+        meta_batida = daily_intake >= recommended_daily_intake
+        history.append({
+            'date': current_date,
+            'daily_intake': daily_intake,
+            'meta_batida': meta_batida
+        })
+        current_date += timedelta(days=1)
+
+    return render(request, 'tracker/history.html', {'history': history})

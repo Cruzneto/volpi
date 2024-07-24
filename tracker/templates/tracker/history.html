@@ -1,17 +1,31 @@
 <!DOCTYPE html>
 <html>
 <head>
+    {% load static %}
     <title>History</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'tracker/style.css' %}">
 </head>
 <body>
-    <h2>History</h2>
-    <ul>
-        {% for record in history %}
-            <li>{{ record.date }}: {{ record.amount }} ml</li>
-        {% empty %}
-            <li>No history available.</li>
-        {% endfor %}
-    </ul>
-    <a href="{% url 'index' %}">Back to Home</a>
+    <h2>Histórico de Consumo de Água</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Data</th>
+                <th>Ingestão Diária (ml)</th>
+                <th>Status da Meta</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for record in history %}
+            <tr>
+                <td>{{ record.date }}</td>
+                <td>{{ record.daily_intake }}</td>
+                <td>{% if record.meta_batida %}Meta Batida{% else %}Meta Não Batida{% endif %}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 </body>
 </html>
